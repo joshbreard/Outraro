@@ -1,0 +1,209 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  client
+  manager
+  admin
+}
+
+enum EmailEventType {
+  sent
+  open
+  reply
+  positive_reply
+  bounce
+  spam
+}
+
+enum DealStatus {
+  OPEN
+  WON
+  LOST
+}
+
+enum ActivityType {
+  EMAIL
+  CALL
+  MEETING
+  TASK
+}
+
+model User {
+  id              String        @id @default(cuid())
+  email           String        @unique
+  name            String?
+  passwordHash    String?
+  role            Role          @default(client)
+  clientAccount   ClientAccount? @relation(fields: [clientAccountId], references: [id])
+  clientAccountId String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model ClientAccount {
+  id               String           @id @default(cuid())
+  name             String
+  slug             String           @unique
+  users            User[]
+  inboxes          Inbox[]
+  leads            Lead[]
+  meetings         Meeting[]
+  deals            Deal[]
+  templates        Template[]
+  callRecordings   CallRecording[]
+  personas         Persona[]
+  domainEvents     DomainHealthEvent[]
+  activities       ActivityEvent[]
+  attribution      AttributionLedger[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model Inbox {
+  id              String        @id @default(cuid())
+  provider        String
+  address         String
+  clientAccount   ClientAccount @relation(fields: [clientAccountId], references: [id])
+  clientAccountId String
+  emailEvents     EmailEvent[]
+  createdAt       DateTime      @default(now())
+}
+
+model EmailEvent {
+  id          String         @id @default(cuid())
+  type        EmailEventType
+  occurredAt  DateTime       @default(now())
+  inbox       Inbox          @relation(fields: [inboxId], references: [id])
+  inboxId     String
+  lead        Lead?          @relation(fields: [leadId], references: [id])
+  leadId      String?
+  metadata    Json?
+}
+
+model Lead {
+  id              String        @id @default(cuid())
+  email           String        @unique
+  name            String?
+  title           String?
+  company         String?
+  persona         Persona?      @relation(fields: [personaId], references: [id])
+  personaId       String?
+  clientAccount   ClientAccount @relation(fields: [clientAccountId], references: [id])
+  clientAccountId String
+  emailEvents     EmailEvent[]
+  meetings        Meeting[]
+  createdAt       DateTime      @default(now())
+}
+
+model Meeting {
+  id              String        @id @default(cuid())
+  title           String
+  scheduledFor    DateTime
+  lead            Lead?         @relation(fields: [leadId], references: [id])
+  leadId          String?
+  clientAccount   ClientAccount @relation(fields: [clientAccountId], references: [id])
+  clientAccountId String
+  source          String?
+  createdAt       DateTime      @default(now())
+}
+
+model Deal {
+  id              String        @id @default(cuid())
+  name            String
+  value           Decimal       @default(0)
+  status          DealStatus    @default(OPEN)
+  closeDate       DateTime?
+  clientAccount   ClientAccount @relation(fields: [clientAccountId], references: [id])
+  clientAccountId String
+  meetings        Meeting[]
+  attribution     AttributionLedger[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Template {
+  id              String            @id @default(cuid())
+  name            String
+  status          String            @default("draft")
+  clientAccount   ClientAccount     @relation(fields: [clientAccountId], references: [id])
+  clientAccountId String
+  variants        TemplateVariant[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model TemplateVariant {
+  id          String    @id @default(cuid())
+  label       String
+  body        String
+  template    Template  @relation(fields: [templateId], references: [id])
+  templateId  String
+  isControl   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+}
+
+model CallRecording {
+  id              String        @id @default(cuid())
+  title           String
+  url             String
+  summary         String?
+  transcript      String?
+  durationSeconds Int?
+  clientAccount   ClientAccount @relation(fields: [clientAccountId], references: [id])
+  clientAccountId String
+  createdAt       DateTime      @default(now())
+}
+
+model Persona {
+  id              String        @id @default(cuid())
+  title           String
+  industry        String?
+  region          String?
+  clientAccount   ClientAccount @relation(fields: [clientAccountId], references: [id])
+  clientAccountId String
+  leads           Lead[]
+}
+
+model DomainHealthEvent {
+  id              String        @id @default(cuid())
+  domain          String
+  score           Int
+  spamRate        Float
+  bounceRate      Float
+  recordedAt      DateTime      @default(now())
+  clientAccount   ClientAccount @relation(fields: [clientAccountId], references: [id])
+  clientAccountId String
+}
+
+model ActivityEvent {
+  id              String        @id @default(cuid())
+  type            ActivityType
+  occurredAt      DateTime      @default(now())
+  clientAccount   ClientAccount @relation(fields: [clientAccountId], references: [id])
+  clientAccountId String
+  inbox           Inbox?        @relation(fields: [inboxId], references: [id])
+  inboxId         String?
+  meeting         Meeting?      @relation(fields: [meetingId], references: [id])
+  meetingId       String?
+  lead            Lead?         @relation(fields: [leadId], references: [id])
+  leadId          String?
+  metadata        Json?
+}
+
+model AttributionLedger {
+  id              String        @id @default(cuid())
+  deal            Deal          @relation(fields: [dealId], references: [id])
+  dealId          String
+  clientAccount   ClientAccount @relation(fields: [clientAccountId], references: [id])
+  clientAccountId String
+  value           Decimal       @default(0)
+  note            String?
+  createdAt       DateTime      @default(now())
+}
