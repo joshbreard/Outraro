@@ -20,6 +20,7 @@ export default function LoginPage() {
     setError("");
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) { setError("Invalid email or password."); setLoading(false); return; }
+    router.refresh();
     router.push("/dashboard");
   };
 
