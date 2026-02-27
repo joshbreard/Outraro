@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
-import { createSupabaseAdmin } from "@/lib/supabase";
+import { createSupabaseAdmin } from "@/lib/supabase-server";
 import { sendWelcomeEmail } from "@/lib/email";
 import Stripe from "stripe";
 import crypto from "crypto";
