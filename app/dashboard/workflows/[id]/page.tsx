@@ -1,18 +1,5 @@
-import ContentDetail from "@/components/content-detail";
+import { redirect } from "next/navigation";
 
-export const revalidate = 3600;
-
-export default async function WorkflowContentPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  return (
-    <ContentDetail
-      id={id}
-      backHref="/dashboard/workflows"
-      backLabel="Back to Workflows"
-    />
-  );
+export default function WorkflowDetailPage() {
+  redirect("/dashboard");
 }
