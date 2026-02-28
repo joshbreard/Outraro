@@ -2,28 +2,25 @@ import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 export async function GET() {
   const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const { data } = await supabase
     .from("user_memory")
-    .select("*")
+    .select("content, updated_at")
     .eq("user_id", user.id)
     .maybeSingle();
 
   return Response.json({
-    memory: data?.content ?? "",
+    content: data?.content ?? "",
     updatedAt: data?.updated_at ?? null,
   });
 }
 
+// Full replace of memory content
 export async function PUT(req: Request) {
   const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const { content } = await req.json();
@@ -31,7 +28,7 @@ export async function PUT(req: Request) {
   const { error } = await supabase.from("user_memory").upsert(
     {
       user_id: user.id,
-      content: content || "",
+      content: content ?? "",
       updated_at: new Date().toISOString(),
     },
     { onConflict: "user_id" }
@@ -41,16 +38,16 @@ export async function PUT(req: Request) {
   return Response.json({ success: true });
 }
 
+// Append new context to memory (used by chat after conversations)
 export async function POST(req: Request) {
   const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const { entry } = await req.json();
-  if (!entry?.trim())
-    return Response.json({ error: "Empty entry" }, { status: 400 });
+  if (!entry || typeof entry !== "string") {
+    return Response.json({ error: "Missing entry" }, { status: 400 });
+  }
 
   const { data: existing } = await supabase
     .from("user_memory")
@@ -63,14 +60,13 @@ export async function POST(req: Request) {
     day: "numeric",
     year: "numeric",
   });
-  const newContent = existing?.content
-    ? `${existing.content}\n\n[${timestamp}] ${entry.trim()}`
-    : `[${timestamp}] ${entry.trim()}`;
+  const newLine = `\n- [${timestamp}] ${entry}`;
+  const updated = (existing?.content ?? "") + newLine;
 
   const { error } = await supabase.from("user_memory").upsert(
     {
       user_id: user.id,
-      content: newContent,
+      content: updated,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "user_id" }
