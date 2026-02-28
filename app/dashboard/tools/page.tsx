@@ -17,7 +17,7 @@ export default async function ToolsPage() {
   const content = allContent.filter((item) => item.category === "Tool Breakdown");
 
   return (
-    <div className="max-w-4xl">
+    <div className="max-w-6xl">
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-surface-900 mb-2">Tool Breakdowns</h2>
         <p className="text-surface-500 text-sm">Deep-dive walkthroughs of the AI tools reshaping B2B sales.</p>
@@ -28,24 +28,24 @@ export default async function ToolsPage() {
           <p className="text-surface-500 text-sm">No content yet. Check back soon!</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {content.map((item) => (
             <Link key={item.id} href={`/dashboard/content/${item.id}`} className="block no-underline">
-              <div className="bg-white border border-surface-200 rounded-2xl overflow-hidden hover:shadow-md transition-all cursor-pointer">
+              <div className="bg-white border border-surface-200 rounded-2xl overflow-hidden hover:shadow-md transition-all cursor-pointer h-full flex flex-col">
                 {item.imageUrl && (
                   <div className="relative w-full aspect-[2/1]">
-                    <Image src={item.imageUrl} alt={item.title} fill className="object-cover" sizes="100vw" />
+                    <Image src={item.imageUrl} alt={item.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
                   </div>
                 )}
-                <div className="p-6">
+                <div className="p-5 flex flex-col flex-1">
                   <div className="flex items-center gap-3 mb-3">
                     <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${categoryColors[item.category] ?? categoryColors["General"]}`}>{item.category}</span>
                     <span className="text-xs text-surface-400">
                       {new Date(item.publishedDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                     </span>
                   </div>
-                  <h3 className="text-lg font-bold text-surface-900 mb-2">{item.title}</h3>
-                  {item.summary && <p className="text-surface-500 text-sm leading-relaxed">{item.summary}</p>}
+                  <h3 className="text-base font-bold text-surface-900 mb-2">{item.title}</h3>
+                  {item.summary && <p className="text-surface-500 text-sm leading-relaxed line-clamp-3">{item.summary}</p>}
                 </div>
               </div>
             </Link>
