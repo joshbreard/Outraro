@@ -7,7 +7,7 @@ export async function GET() {
 
   const { data } = await supabase
     .from("user_memory")
-    .select("content, updated_at")
+    .select("*")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -38,16 +38,14 @@ export async function PUT(req: Request) {
   return Response.json({ success: true });
 }
 
-// Append new context to memory (used by chat after conversations)
+// Append to memory (used by chat API after conversations)
 export async function POST(req: Request) {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const { entry } = await req.json();
-  if (!entry || typeof entry !== "string") {
-    return Response.json({ error: "Missing entry" }, { status: 400 });
-  }
+  if (!entry) return Response.json({ error: "No entry provided" }, { status: 400 });
 
   const { data: existing } = await supabase
     .from("user_memory")
@@ -60,8 +58,10 @@ export async function POST(req: Request) {
     day: "numeric",
     year: "numeric",
   });
-  const newLine = `\n- [${timestamp}] ${entry}`;
-  const updated = (existing?.content ?? "") + newLine;
+  const newLine = `- [${timestamp}] ${entry}`;
+  const updated = existing?.content
+    ? `${existing.content}\n${newLine}`
+    : newLine;
 
   const { error } = await supabase.from("user_memory").upsert(
     {
