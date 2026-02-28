@@ -11,7 +11,6 @@ function RoIcon({ className }: { className?: string }) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      {/* Lightbulb body */}
       <path
         d="M9 21h6M12 3a6 6 0 0 0-4 10.5V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3.5A6 6 0 0 0 12 3z"
         stroke="currentColor"
@@ -19,12 +18,10 @@ function RoIcon({ className }: { className?: string }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {/* Sparkle top-right */}
       <path
         d="M19 3l-.5 1.5L17 5l1.5.5L19 7l.5-1.5L21 5l-1.5-.5L19 3z"
         fill="currentColor"
       />
-      {/* Small sparkle */}
       <path
         d="M5 7l-.3.9L4 8.2l.7.3.3.9.3-.9.7-.3-.7-.3L5 7z"
         fill="currentColor"
@@ -42,6 +39,8 @@ export default function RoChat({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const conversationId = useRef(crypto.randomUUID());
+  const prevLoadingRef = useRef(false);
 
   const { messages, input, handleInputChange, handleSubmit, isLoading, append } =
     useChat({
@@ -52,9 +51,26 @@ export default function RoChat({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Save conversation to Supabase when assistant finishes responding
+  useEffect(() => {
+    if (prevLoadingRef.current && !isLoading && messages.length >= 2) {
+      fetch("/api/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversationId: conversationId.current,
+          articleId,
+          articleTitle,
+          messages: messages.map((m) => ({ role: m.role, content: m.content })),
+        }),
+      });
+    }
+    prevLoadingRef.current = isLoading;
+  }, [isLoading, messages, articleId, articleTitle]);
+
   const suggestedQuestions = articleTitle
     ? [
-        `Summarize this article in 3 bullet points`,
+        "Summarize this article in 3 bullet points",
         "How do I apply this to my outreach?",
         "What are the key takeaways?",
       ]
@@ -91,7 +107,7 @@ export default function RoChat({
       </button>
 
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-[22rem] sm:w-96 h-[32rem] bg-white border border-surface-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200">
+        <div className="fixed bottom-24 right-6 z-50 w-[22rem] sm:w-96 h-[32rem] bg-white border border-surface-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
           <div className="bg-brand-600 text-white px-5 py-4 flex items-center gap-3 shrink-0">
             <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
               <RoIcon className="w-5 h-5" />

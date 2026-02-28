@@ -2,6 +2,7 @@ import { getPublishedContent, getPageContent } from "@/lib/notion";
 import Image from "next/image";
 import Link from "next/link";
 import RoChat from "@/components/ro-chat";
+import SaveArticleButton from "@/components/save-article-button";
 
 const categoryColors: Record<string, string> = {
   "Tool Breakdown": "bg-blue-50 text-blue-700 border-blue-200",
@@ -90,9 +91,18 @@ export default async function ContentDetail({
           </span>
         </div>
 
-        <h1 className="text-3xl font-bold text-surface-900 mb-4">
-          {item.title}
-        </h1>
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <h1 className="text-3xl font-bold text-surface-900">
+            {item.title}
+          </h1>
+          <SaveArticleButton
+            articleId={id}
+            articleTitle={item.title}
+            articleCategory={item.category}
+            articleImageUrl={item.imageUrl}
+          />
+        </div>
+
         {item.summary && (
           <p className="text-lg text-surface-500 leading-relaxed mb-8">
             {item.summary}
