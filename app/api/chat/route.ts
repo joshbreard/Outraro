@@ -2,14 +2,15 @@ import { streamText } from "ai";
 import { openai } from "@/lib/openai";
 import { generateEmbedding, searchSimilarChunks } from "@/lib/embeddings";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { getToolBySlug } from "@/lib/tool-catalog";
 
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
-  const { messages, articleId, articleTitle } = await req.json();
+  const { messages, articleId, articleTitle, toolSlug, toolName } =
+    await req.json();
   const lastMessage = messages[messages.length - 1].content;
 
-  // Fetch user's sales profile for personalization
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -58,6 +59,49 @@ export async function POST(req: Request) {
     }
   }
 
+  // Tool guide mode: use cached guide + memory as context
+  if (toolSlug && user) {
+    const tool = getToolBySlug(toolSlug);
+
+    const { data: guideData } = await supabase
+      .from("tool_guides")
+      .select("guide_content")
+      .eq("user_id", user.id)
+      .eq("tool_slug", toolSlug)
+      .maybeSingle();
+
+    const { data: memoryData } = await supabase
+      .from("user_memory")
+      .select("content")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    const toolContext = guideData?.guide_content
+      ? `\n\nPersonalized Guide for ${toolName || tool?.name}:\n${guideData.guide_content}`
+      : "";
+    const memoryContext = memoryData?.content
+      ? `\n\nUser Memory (accumulated context from past conversations):\n${memoryData.content}`
+      : "";
+
+    const systemPrompt = `You are Bolt, the AI sales coach built into Outraro. The user is reading a personalized guide about "${toolName || tool?.name}". Answer their questions using the guide content and your knowledge of this tool. Be concise, actionable, and specific to the user's situation. Use short paragraphs. When comparing tools, be honest about trade-offs. Always tie advice back to the user's specific product, buyers, and challenges.${profileContext}${toolContext}${memoryContext}`;
+
+    const result = streamText({
+      model: openai("gpt-4o"),
+      system: systemPrompt,
+      messages,
+    });
+
+    // After streaming completes, extract memory signals in the background
+    if (messages.length >= 3) {
+      extractMemorySignals(user.id, messages, toolName || tool?.name || "").catch(
+        () => {}
+      );
+    }
+
+    return result.toDataStreamResponse();
+  }
+
+  // Standard article mode: use embeddings
   const queryEmbedding = await generateEmbedding(lastMessage);
 
   const articleChunks = articleId
@@ -95,4 +139,57 @@ export async function POST(req: Request) {
   });
 
   return result.toDataStreamResponse();
+}
+
+async function extractMemorySignals(
+  userId: string,
+  messages: any[],
+  toolName: string
+) {
+  try {
+    const { text } = await import("ai").then((ai) =>
+      ai.generateText({
+        model: openai("gpt-4o-mini"),
+        prompt: `Extract key signals from this conversation about ${toolName} that would be useful context for future interactions. Focus on: tools being evaluated, specific challenges mentioned, preferences expressed, decisions made, and workflow details shared.\n\nConversation:\n${messages
+          .slice(-6)
+          .map((m: any) => `${m.role}: ${m.content}`)
+          .join(
+            "\n"
+          )}\n\nReturn a single concise sentence summarizing the key signal. If nothing notable, return "NONE".`,
+      })
+    );
+
+    if (text && text !== "NONE" && text.length < 500) {
+      const { createSupabaseServerClient } = await import(
+        "@/lib/supabase-server"
+      );
+      const supabase = await createSupabaseServerClient();
+
+      const { data: existing } = await supabase
+        .from("user_memory")
+        .select("content")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      const timestamp = new Date().toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+      const newContent = existing?.content
+        ? `${existing.content}\n\n[${timestamp}] ${text.trim()}`
+        : `[${timestamp}] ${text.trim()}`;
+
+      await supabase.from("user_memory").upsert(
+        {
+          user_id: userId,
+          content: newContent,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id" }
+      );
+    }
+  } catch {
+    // Silent fail for background memory extraction
+  }
 }

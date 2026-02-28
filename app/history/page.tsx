@@ -11,22 +11,11 @@ export default async function HistoryPage() {
 
   if (!user) return null;
 
-  const { data: savedArticles } = await supabase
-    .from("saved_articles")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("saved_at", { ascending: false });
-
   const { data: conversations } = await supabase
     .from("ro_conversations")
     .select("*")
     .eq("user_id", user.id)
     .order("updated_at", { ascending: false });
 
-  return (
-    <HistoryView
-      savedArticles={savedArticles ?? []}
-      conversations={conversations ?? []}
-    />
-  );
+  return <HistoryView conversations={conversations ?? []} />;
 }
