@@ -50,19 +50,6 @@ export default function ContentLibrary({
     });
   }, [articles, search, activeCategory]);
 
-  const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-  const newThisWeek = filtered.filter(
-    (item) => new Date(item.publishedDate) >= oneWeekAgo
-  );
-  const older = filtered.filter(
-    (item) => new Date(item.publishedDate) < oneWeekAgo
-  );
-
-  const showSections =
-    activeCategory === "all" && search.trim() === "" && newThisWeek.length > 0;
-
   return (
     <div className="max-w-5xl">
       <div className="mb-8">
@@ -142,34 +129,6 @@ export default function ContentLibrary({
               : "No articles in this category yet."}
           </p>
         </div>
-      ) : showSections ? (
-        <>
-          <div className="mb-10">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-              <h2 className="text-lg font-bold text-surface-900">
-                New This Week
-              </h2>
-            </div>
-            <div className="grid md:grid-cols-2 gap-4">
-              {newThisWeek.map((item) => (
-                <ContentCard key={item.id} item={item} />
-              ))}
-            </div>
-          </div>
-          {older.length > 0 && (
-            <div>
-              <h2 className="text-lg font-bold text-surface-900 mb-4">
-                Earlier
-              </h2>
-              <div className="grid md:grid-cols-2 gap-4">
-                {older.map((item) => (
-                  <ContentCard key={item.id} item={item} />
-                ))}
-              </div>
-            </div>
-          )}
-        </>
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
           {filtered.map((item) => (
