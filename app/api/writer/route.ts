@@ -71,6 +71,8 @@ export async function POST(req: Request) {
     if (profile.target_titles) parts.push(`Typical target buyers: ${profile.target_titles}`);
     if (profile.company_size) parts.push(`Target company size: ${profile.company_size}`);
     if (profile.outreach_channels) parts.push(`Outreach channels: ${profile.outreach_channels}`);
+    if (profile.crm_used) parts.push(`CRM: ${profile.crm_used}`);
+    if (profile.team_size) parts.push(`SDR team size: ${profile.team_size}`);
     if (profile.experience_level) {
       const levels: Record<string, string> = {
         new: "Brand new SDR (0-3 months)",

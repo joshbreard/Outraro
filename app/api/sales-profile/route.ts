@@ -38,6 +38,8 @@ export async function POST(req: Request) {
       experience_level: body.experience_level || null,
       biggest_challenge: body.biggest_challenge || null,
       tools_used: body.tools_used || null,
+      crm_used: body.crm_used || null,
+      team_size: body.team_size || null,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "user_id" }

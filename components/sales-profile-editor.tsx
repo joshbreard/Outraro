@@ -22,6 +22,25 @@ const EXPERIENCE_LEVELS = [
   { value: "veteran", label: "Veteran (3+ years)" },
 ];
 
+const CRMS = [
+  "Salesforce",
+  "HubSpot",
+  "Pipedrive",
+  "Close",
+  "Zoho CRM",
+  "Monday Sales CRM",
+  "None / Spreadsheets",
+  "Other",
+];
+
+const SDR_TEAM_SIZES = [
+  "Just me",
+  "2 to 5 SDRs",
+  "6 to 10 SDRs",
+  "11 to 25 SDRs",
+  "25+ SDRs",
+];
+
 export default function SalesProfileEditor() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -35,6 +54,8 @@ export default function SalesProfileEditor() {
   const [experienceLevel, setExperienceLevel] = useState("");
   const [biggestChallenge, setBiggestChallenge] = useState("");
   const [toolsUsed, setToolsUsed] = useState("");
+  const [crmUsed, setCrmUsed] = useState("");
+  const [teamSize, setTeamSize] = useState("");
 
   useEffect(() => {
     fetch("/api/sales-profile")
@@ -49,6 +70,8 @@ export default function SalesProfileEditor() {
           setExperienceLevel(data.profile.experience_level || "");
           setBiggestChallenge(data.profile.biggest_challenge || "");
           setToolsUsed(data.profile.tools_used || "");
+          setCrmUsed(data.profile.crm_used || "");
+          setTeamSize(data.profile.team_size || "");
         }
         setLoading(false);
       })
@@ -72,10 +95,12 @@ export default function SalesProfileEditor() {
         experience_level: experienceLevel,
         biggest_challenge: biggestChallenge,
         tools_used: toolsUsed,
+        crm_used: crmUsed,
+        team_size: teamSize,
       }),
     });
 
-    setMessage("Profile updated. Ro will use this in your next conversation.");
+    setMessage("Profile updated. Bolt will use this in your next conversation.");
     setSaving(false);
   };
 
@@ -96,11 +121,11 @@ export default function SalesProfileEditor() {
       <div className="flex items-center gap-3 mb-1">
         <h3 className="text-lg font-semibold text-surface-900">Sales Profile</h3>
         <span className="text-xs bg-brand-50 text-brand-700 px-2 py-0.5 rounded-full font-medium">
-          Powers Ro
+          Powers Bolt
         </span>
       </div>
       <p className="text-surface-500 text-sm mb-5">
-        Ro uses this to personalize every answer to your specific situation.
+        Bolt uses this to personalize every answer to your specific situation.
       </p>
 
       <form onSubmit={handleSave} className="space-y-4">
@@ -194,6 +219,43 @@ export default function SalesProfileEditor() {
           </div>
         </div>
 
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-surface-700 mb-1.5">
+              CRM
+            </label>
+            <select
+              value={crmUsed}
+              onChange={(e) => setCrmUsed(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border border-surface-300 bg-surface-50 text-surface-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all text-sm"
+            >
+              <option value="">Select...</option>
+              {CRMS.map((crm) => (
+                <option key={crm} value={crm}>
+                  {crm}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-surface-700 mb-1.5">
+              SDRs on Your Team
+            </label>
+            <select
+              value={teamSize}
+              onChange={(e) => setTeamSize(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border border-surface-300 bg-surface-50 text-surface-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all text-sm"
+            >
+              <option value="">Select...</option>
+              {SDR_TEAM_SIZES.map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-surface-700 mb-1.5">
             Tools You Use
@@ -202,7 +264,7 @@ export default function SalesProfileEditor() {
             type="text"
             value={toolsUsed}
             onChange={(e) => setToolsUsed(e.target.value)}
-            placeholder="e.g., Apollo, Outreach, HubSpot, Salesforce"
+            placeholder="e.g., Apollo, Outreach, LinkedIn Sales Nav"
             className="w-full px-4 py-3 rounded-xl border border-surface-300 bg-surface-50 text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all text-sm"
           />
         </div>

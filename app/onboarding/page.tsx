@@ -34,6 +34,25 @@ const CHANNELS = [
   "Social Selling",
 ];
 
+const CRMS = [
+  "Salesforce",
+  "HubSpot",
+  "Pipedrive",
+  "Close",
+  "Zoho CRM",
+  "Monday Sales CRM",
+  "None / Spreadsheets",
+  "Other",
+];
+
+const SDR_TEAM_SIZES = [
+  "Just me",
+  "2 to 5 SDRs",
+  "6 to 10 SDRs",
+  "11 to 25 SDRs",
+  "25+ SDRs",
+];
+
 const EXPERIENCE_LEVELS = [
   { value: "new", label: "Brand new (0-3 months)" },
   { value: "getting_started", label: "Getting started (3-12 months)" },
@@ -62,6 +81,8 @@ export default function OnboardingPage() {
   const [companySize, setCompanySize] = useState("");
   const [channels, setChannels] = useState<string[]>([]);
   const [toolsUsed, setToolsUsed] = useState("");
+  const [crmUsed, setCrmUsed] = useState("");
+  const [teamSize, setTeamSize] = useState("");
   const [experienceLevel, setExperienceLevel] = useState("");
   const [biggestChallenge, setBiggestChallenge] = useState("");
 
@@ -93,6 +114,8 @@ export default function OnboardingPage() {
         experience_level: experienceLevel,
         biggest_challenge: biggestChallenge,
         tools_used: toolsUsed,
+        crm_used: crmUsed,
+        team_size: teamSize,
       }),
     });
     router.push("/library");
@@ -102,7 +125,7 @@ export default function OnboardingPage() {
     {
       title: "What do you sell?",
       subtitle:
-        "Help Ro understand your product so every answer is specific to your world.",
+        "Help Bolt understand your product so every answer is specific to your world.",
       content: (
         <div className="space-y-5">
           <div>
@@ -144,7 +167,7 @@ export default function OnboardingPage() {
     {
       title: "Who\u2019s your ideal buyer?",
       subtitle:
-        "Ro will tailor outreach advice to match your target personas.",
+        "Bolt will tailor outreach advice to match your target personas.",
       content: (
         <div className="space-y-5">
           <div>
@@ -186,7 +209,7 @@ export default function OnboardingPage() {
     {
       title: "How do you reach prospects?",
       subtitle:
-        "Select all channels you use. Ro will prioritize relevant tactics.",
+        "Select all channels you use. Bolt will prioritize relevant tactics.",
       content: (
         <div className="space-y-5">
           <div>
@@ -235,6 +258,27 @@ export default function OnboardingPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-surface-700 mb-1.5">
+              CRM
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {CRMS.map((crm) => (
+                <button
+                  key={crm}
+                  type="button"
+                  onClick={() => setCrmUsed(crm)}
+                  className={`px-3 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer text-left ${
+                    crmUsed === crm
+                      ? "bg-brand-50 border-brand-300 text-brand-700 border-2"
+                      : "bg-white border border-surface-200 text-surface-600 hover:border-surface-300"
+                  }`}
+                >
+                  {crm}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-surface-700 mb-1.5">
               Tools you use{" "}
               <span className="text-surface-400 font-normal">(optional)</span>
             </label>
@@ -242,7 +286,7 @@ export default function OnboardingPage() {
               type="text"
               value={toolsUsed}
               onChange={(e) => setToolsUsed(e.target.value)}
-              placeholder="e.g., Apollo, Outreach, HubSpot, LinkedIn Sales Nav"
+              placeholder="e.g., Apollo, Outreach, LinkedIn Sales Nav"
               className="w-full px-4 py-3 rounded-xl border border-surface-300 bg-surface-50 text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all text-sm"
             />
           </div>
@@ -250,10 +294,31 @@ export default function OnboardingPage() {
       ),
     },
     {
-      title: "Where are you in your journey?",
-      subtitle: "This helps Ro calibrate advice to your experience level.",
+      title: "Tell us about your team",
+      subtitle: "This helps Bolt calibrate advice to your experience and team setup.",
       content: (
         <div className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-surface-700 mb-1.5">
+              SDRs on your team
+            </label>
+            <div className="space-y-2">
+              {SDR_TEAM_SIZES.map((size) => (
+                <button
+                  key={size}
+                  type="button"
+                  onClick={() => setTeamSize(size)}
+                  className={`w-full px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer text-left ${
+                    teamSize === size
+                      ? "bg-brand-50 border-brand-300 text-brand-700 border-2"
+                      : "bg-white border border-surface-200 text-surface-600 hover:border-surface-300"
+                  }`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          </div>
           <div>
             <label className="block text-sm font-medium text-surface-700 mb-1.5">
               Experience level
