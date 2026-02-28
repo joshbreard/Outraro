@@ -34,18 +34,28 @@ function BoltIcon({ className }: { className?: string }) {
 export default function BoltChat({
   articleId,
   articleTitle,
+  toolSlug,
+  toolName,
 }: {
   articleId?: string;
   articleTitle?: string;
+  toolSlug?: string;
+  toolName?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const conversationId = useRef(crypto.randomUUID());
   const prevLoadingRef = useRef(false);
 
+  const contextLabel = toolName
+    ? `Tool Guide: ${toolName}`
+    : articleTitle
+    ? `Reading: ${articleTitle}`
+    : "Your AI sales coach";
+
   const { messages, input, handleInputChange, handleSubmit, isLoading, append } =
     useChat({
-      body: { articleId, articleTitle },
+      body: { articleId, articleTitle, toolSlug, toolName },
     });
 
   useEffect(() => {
@@ -59,16 +69,37 @@ export default function BoltChat({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           conversationId: conversationId.current,
-          articleId,
-          articleTitle,
+          articleId: articleId ?? toolSlug ?? null,
+          articleTitle: toolName ? `Tool Guide: ${toolName}` : articleTitle ?? null,
           messages: messages.map((m) => ({ role: m.role, content: m.content })),
         }),
       });
+
+      // Append key signals to memory after tool guide conversations
+      if (toolSlug && messages.length >= 4) {
+        const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant");
+        const lastUser = [...messages].reverse().find((m) => m.role === "user");
+        if (lastUser && lastAssistant) {
+          fetch("/api/memory", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              content: `[${new Date().toLocaleDateString()}] Asked about ${toolName}: "${lastUser.content.slice(0, 120)}"`,
+            }),
+          });
+        }
+      }
     }
     prevLoadingRef.current = isLoading;
-  }, [isLoading, messages, articleId, articleTitle]);
+  }, [isLoading, messages, articleId, articleTitle, toolSlug, toolName]);
 
-  const suggestedQuestions = articleTitle
+  const suggestedQuestions = toolSlug
+    ? [
+        `How does ${toolName} compare to alternatives?`,
+        `What's the best way to set up ${toolName} for my use case?`,
+        `Is ${toolName} worth it for a small team?`,
+      ]
+    : articleTitle
     ? [
         "Summarize this article in 3 bullet points",
         "How do I apply this to my outreach?",
@@ -114,11 +145,7 @@ export default function BoltChat({
             </div>
             <div className="min-w-0">
               <h3 className="font-semibold text-sm">Bolt</h3>
-              <p className="text-xs text-white/70 truncate">
-                {articleTitle
-                  ? `Reading: ${articleTitle}`
-                  : "Your AI sales coach"}
-              </p>
+              <p className="text-xs text-white/70 truncate">{contextLabel}</p>
             </div>
           </div>
 
@@ -126,8 +153,12 @@ export default function BoltChat({
             {messages.length === 0 && (
               <div className="space-y-3">
                 <p className="text-surface-500 text-sm">
-                  Hey! I&apos;m Bolt, your AI sales coach. Ask me anything about{" "}
-                  {articleTitle ? "this article" : "our content library"}.
+                  Hey! I&apos;m Bolt, your AI sales coach.{" "}
+                  {toolName
+                    ? `Ask me anything about ${toolName}.`
+                    : articleTitle
+                    ? "Ask me anything about this article."
+                    : "Ask me anything about our content library."}
                 </p>
                 <div className="space-y-2">
                   {suggestedQuestions.map((q, i) => (
