@@ -3,6 +3,36 @@
 import { useChat } from "ai/react";
 import { useState, useRef, useEffect } from "react";
 
+function RoIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Lightbulb body */}
+      <path
+        d="M9 21h6M12 3a6 6 0 0 0-4 10.5V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3.5A6 6 0 0 0 12 3z"
+        stroke="currentColor"
+        strokeWidth={1.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Sparkle top-right */}
+      <path
+        d="M19 3l-.5 1.5L17 5l1.5.5L19 7l.5-1.5L21 5l-1.5-.5L19 3z"
+        fill="currentColor"
+      />
+      {/* Small sparkle */}
+      <path
+        d="M5 7l-.3.9L4 8.2l.7.3.3.9.3-.9.7-.3-.7-.3L5 7z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 export default function RoChat({
   articleId,
   articleTitle,
@@ -38,7 +68,7 @@ export default function RoChat({
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 bg-brand-600 hover:bg-brand-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-all hover:scale-105"
+        className="fixed bottom-6 right-6 z-50 bg-brand-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg cursor-pointer transition-all duration-200 ease-out hover:bg-brand-700 hover:scale-110 hover:shadow-xl hover:shadow-brand-600/25 active:scale-95 active:shadow-md"
         aria-label="Ask Ro"
       >
         {isOpen ? (
@@ -56,15 +86,15 @@ export default function RoChat({
             />
           </svg>
         ) : (
-          <span className="text-sm font-bold">Ro</span>
+          <RoIcon className="w-7 h-7" />
         )}
       </button>
 
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-[22rem] sm:w-96 h-[32rem] bg-white border border-surface-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+        <div className="fixed bottom-24 right-6 z-50 w-[22rem] sm:w-96 h-[32rem] bg-white border border-surface-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200">
           <div className="bg-brand-600 text-white px-5 py-4 flex items-center gap-3 shrink-0">
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-sm font-bold">
-              R
+            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+              <RoIcon className="w-5 h-5" />
             </div>
             <div className="min-w-0">
               <h3 className="font-semibold text-sm">Ro</h3>
