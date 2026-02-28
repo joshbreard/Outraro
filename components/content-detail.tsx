@@ -1,7 +1,7 @@
 import { getPublishedContent, getPageContent } from "@/lib/notion";
 import Image from "next/image";
 import Link from "next/link";
-import RoChat from "@/components/ro-chat";
+import BoltChat from "@/components/bolt-chat";
 import SaveArticleButton from "@/components/save-article-button";
 
 const categoryColors: Record<string, string> = {
@@ -115,7 +115,7 @@ export default async function ContentDetail({
         />
       </div>
 
-      <RoChat articleId={id} articleTitle={item.title} />
+      <BoltChat articleId={id} articleTitle={item.title} />
     </>
   );
 }
