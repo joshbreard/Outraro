@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import SaveArticleButton from "@/components/save-article-button";
 
 interface ContentItem {
   id: string;
@@ -59,7 +60,6 @@ export default function ContentLibrary({
         </p>
       </div>
 
-      {/* Search bar */}
       <div className="relative mb-4">
         <svg
           className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400"
@@ -103,7 +103,6 @@ export default function ContentLibrary({
         )}
       </div>
 
-      {/* Category pills */}
       <div className="flex flex-wrap gap-2 mb-8">
         {categoryFilters.map((cat) => (
           <button
@@ -120,7 +119,6 @@ export default function ContentLibrary({
         ))}
       </div>
 
-      {/* Results */}
       {filtered.length === 0 ? (
         <div className="bg-white border border-surface-200 rounded-2xl p-12 text-center">
           <p className="text-surface-500 text-sm">
@@ -158,7 +156,7 @@ function ContentCard({ item }: { item: ContentItem }) {
             />
           </div>
         )}
-        <div className="p-5 flex-1 flex flex-col">
+        <div className="p-5 flex-1 flex flex-col relative">
           <div className="flex items-center gap-3 mb-2">
             <span
               className={`text-xs font-semibold px-3 py-1 rounded-full border ${colorClass}`}
@@ -173,14 +171,28 @@ function ContentCard({ item }: { item: ContentItem }) {
               })}
             </span>
           </div>
-          <h3 className="font-bold text-surface-900 mb-2 text-base leading-snug">
+          <h3 className="font-bold text-surface-900 mb-2 text-base leading-snug pr-10">
             {item.title}
           </h3>
           {item.summary && (
-            <p className="text-surface-500 text-xs leading-relaxed line-clamp-2">
+            <p className="text-surface-500 text-xs leading-relaxed line-clamp-2 pr-10">
               {item.summary}
             </p>
           )}
+          <div
+            className="absolute bottom-4 right-4"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
+            <SaveArticleButton
+              articleId={item.id}
+              articleTitle={item.title}
+              articleCategory={item.category}
+              articleImageUrl={item.imageUrl}
+            />
+          </div>
         </div>
       </div>
     </Link>
