@@ -7,7 +7,7 @@ export const revalidate = 3600;
 const categoryColors: Record<string, string> = {
   "Tool Breakdown": "bg-blue-50 text-blue-700 border-blue-200",
   "Prompt Library": "bg-purple-50 text-purple-700 border-purple-200",
-  "Workflow": "bg-emerald-50 text-emerald-700 border-emerald-200",
+  Workflow: "bg-emerald-50 text-emerald-700 border-emerald-200",
   "News Brief": "bg-amber-50 text-amber-700 border-amber-200",
   General: "bg-surface-100 text-surface-600 border-surface-200",
 };
@@ -30,7 +30,7 @@ export default async function PromptsPage() {
       ) : (
         <div className="space-y-4">
           {content.map((item) => (
-            <Link key={item.id} href={`/dashboard/content/${item.id}`} className="block no-underline">
+            <Link key={item.id} href={`/dashboard/prompts/${item.id}`} className="block no-underline">
               <div className="bg-white border border-surface-200 rounded-2xl overflow-hidden hover:shadow-md transition-all cursor-pointer">
                 {item.imageUrl && (
                   <div className="relative w-full aspect-[2/1]">
