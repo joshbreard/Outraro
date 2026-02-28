@@ -2,6 +2,7 @@
 
 import { useChat } from "ai/react";
 import { useState, useRef, useEffect } from "react";
+import FormattedMessage from "@/components/formatted-message";
 
 function RoIcon({ className }: { className?: string }) {
   return (
@@ -51,7 +52,6 @@ export default function RoChat({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Save conversation to Supabase when assistant finishes responding
   useEffect(() => {
     if (prevLoadingRef.current && !isLoading && messages.length >= 2) {
       fetch("/api/conversations", {
@@ -151,13 +151,13 @@ export default function RoChat({
                 }`}
               >
                 <div
-                  className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+                  className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed ${
                     m.role === "user"
                       ? "bg-brand-600 text-white rounded-br-md"
                       : "bg-surface-100 text-surface-800 rounded-bl-md"
                   }`}
                 >
-                  {m.content}
+                  <FormattedMessage content={m.content} />
                 </div>
               </div>
             ))}

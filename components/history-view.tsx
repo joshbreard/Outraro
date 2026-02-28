@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useChat } from "ai/react";
 import Link from "next/link";
+import FormattedMessage from "@/components/formatted-message";
 
 interface SavedArticle {
   id: number;
@@ -99,13 +100,13 @@ function ConversationThread({ convo }: { convo: Conversation }) {
             }`}
           >
             <div
-              className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+              className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed ${
                 m.role === "user"
                   ? "bg-brand-600 text-white rounded-br-md"
                   : "bg-white text-surface-800 rounded-bl-md border border-surface-200"
               }`}
             >
-              {m.content}
+              <FormattedMessage content={m.content} />
             </div>
           </div>
         ))}
