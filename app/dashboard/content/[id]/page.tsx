@@ -1,18 +1,10 @@
-import ContentDetail from "@/components/content-detail";
+import { redirect } from "next/navigation";
 
-export const revalidate = 3600;
-
-export default async function ContentDetailPage({
+export default async function OldContentDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return (
-    <ContentDetail
-      id={id}
-      backHref="/dashboard/content"
-      backLabel="Back to Library"
-    />
-  );
+  redirect(`/library/${id}`);
 }

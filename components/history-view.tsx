@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useChat } from "ai/react";
 import Link from "next/link";
 
 interface SavedArticle {
@@ -44,6 +45,138 @@ function timeAgo(date: string): string {
     month: "short",
     day: "numeric",
   });
+}
+
+function ConversationThread({ convo }: { convo: Conversation }) {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const prevLoadingRef = useRef(false);
+
+  const { messages, input, handleInputChange, handleSubmit, isLoading } =
+    useChat({
+      initialMessages: convo.messages.map((m, i) => ({
+        id: `history-${i}`,
+        role: m.role as "user" | "assistant",
+        content: m.content,
+      })),
+      body: {
+        articleId: convo.article_id,
+        articleTitle: convo.article_title,
+      },
+    });
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  useEffect(() => {
+    if (
+      prevLoadingRef.current &&
+      !isLoading &&
+      messages.length > convo.messages.length
+    ) {
+      fetch("/api/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversationId: convo.id,
+          articleId: convo.article_id,
+          articleTitle: convo.article_title,
+          messages: messages.map((m) => ({ role: m.role, content: m.content })),
+        }),
+      });
+    }
+    prevLoadingRef.current = isLoading;
+  }, [isLoading, messages, convo]);
+
+  return (
+    <div className="border-t border-surface-200 bg-surface-50">
+      <div className="p-4 space-y-3 max-h-96 overflow-y-auto">
+        {messages.map((m) => (
+          <div
+            key={m.id}
+            className={`flex ${
+              m.role === "user" ? "justify-end" : "justify-start"
+            }`}
+          >
+            <div
+              className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+                m.role === "user"
+                  ? "bg-brand-600 text-white rounded-br-md"
+                  : "bg-white text-surface-800 rounded-bl-md border border-surface-200"
+              }`}
+            >
+              {m.content}
+            </div>
+          </div>
+        ))}
+
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="bg-white text-surface-500 px-3.5 py-2.5 rounded-2xl rounded-bl-md text-sm border border-surface-200">
+              <span className="flex items-center gap-1">
+                <span
+                  className="w-1.5 h-1.5 bg-surface-400 rounded-full animate-bounce"
+                  style={{ animationDelay: "0ms" }}
+                />
+                <span
+                  className="w-1.5 h-1.5 bg-surface-400 rounded-full animate-bounce"
+                  style={{ animationDelay: "150ms" }}
+                />
+                <span
+                  className="w-1.5 h-1.5 bg-surface-400 rounded-full animate-bounce"
+                  style={{ animationDelay: "300ms" }}
+                />
+              </span>
+            </div>
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
+      </div>
+
+      {convo.article_id && (
+        <div className="px-4 pb-2">
+          <Link
+            href={`/library/${convo.article_id}`}
+            className="text-xs text-brand-600 hover:text-brand-700 font-medium no-underline hover:underline"
+          >
+            View article &rarr;
+          </Link>
+        </div>
+      )}
+
+      <form
+        onSubmit={handleSubmit}
+        className="border-t border-surface-200 p-3 flex gap-2"
+      >
+        <input
+          value={input}
+          onChange={handleInputChange}
+          placeholder="Continue the conversation..."
+          className="flex-1 text-sm bg-white border border-surface-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-surface-800 placeholder-surface-400"
+        />
+        <button
+          type="submit"
+          disabled={isLoading || !input.trim()}
+          className="bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-xl px-3.5 py-2.5 transition-colors cursor-pointer"
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+            />
+          </svg>
+        </button>
+      </form>
+    </div>
+  );
 }
 
 export default function HistoryView({
@@ -251,45 +384,7 @@ export default function HistoryView({
                       )}
                     </button>
 
-                    {isExpanded && (
-                      <div className="border-t border-surface-200 p-4 space-y-3 bg-surface-50">
-                        {convo.messages.map(
-                          (
-                            m: { role: string; content: string },
-                            i: number
-                          ) => (
-                            <div
-                              key={i}
-                              className={`flex ${
-                                m.role === "user"
-                                  ? "justify-end"
-                                  : "justify-start"
-                              }`}
-                            >
-                              <div
-                                className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
-                                  m.role === "user"
-                                    ? "bg-brand-600 text-white rounded-br-md"
-                                    : "bg-white text-surface-800 rounded-bl-md border border-surface-200"
-                                }`}
-                              >
-                                {m.content}
-                              </div>
-                            </div>
-                          )
-                        )}
-                        {convo.article_id && (
-                          <div className="pt-2">
-                            <Link
-                              href={`/library/${convo.article_id}`}
-                              className="text-xs text-brand-600 hover:text-brand-700 font-medium no-underline hover:underline"
-                            >
-                              View article &rarr;
-                            </Link>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                    {isExpanded && <ConversationThread convo={convo} />}
                   </div>
                 );
               })}
