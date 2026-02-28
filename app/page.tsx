@@ -18,7 +18,7 @@ export default function HomePage() {
               <a href="#solution" className="text-sm text-surface-500 hover:text-surface-900 transition-colors">What You Learn</a>
               <a href="#outcomes" className="text-sm text-surface-500 hover:text-surface-900 transition-colors">Outcomes</a>
               <a href="#pricing" className="text-sm text-surface-500 hover:text-surface-900 transition-colors">Pricing</a>
-              <CheckoutButton className="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-all glow-btn">Join Now</CheckoutButton>
+              <a href="#pricing" className="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-all glow-btn">Join Now</a>
             </div>
           </div>
         </div>
@@ -43,9 +43,9 @@ export default function HomePage() {
                 Outraro keeps you ahead of every AI wave before it hits your org chart.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                <CheckoutButton className="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-8 py-4 rounded-xl text-lg glow-btn inline-flex items-center justify-center gap-2">
+                <a href="#pricing" className="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-8 py-4 rounded-xl text-lg glow-btn inline-flex items-center justify-center gap-2">
                   Become a Member <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-                </CheckoutButton>
+                </a>
                 <a href="#solution" className="border border-surface-300 hover:border-surface-400 text-surface-700 hover:text-surface-900 font-semibold px-8 py-4 rounded-xl text-lg transition-all inline-flex items-center justify-center gap-2">See What&apos;s Inside</a>
               </div>
               <div className="grid grid-cols-3 gap-6 max-w-md">
@@ -109,9 +109,9 @@ export default function HomePage() {
               <p className="text-zinc-300 text-lg leading-relaxed">
                 These aren&apos;t bloggers or influencers. These are the people <span className="text-white font-semibold">building the AI</span>, <span className="text-white font-semibold">funding the AI</span>, and <span className="text-white font-semibold">deploying the AI</span>. When they tell you what&apos;s coming, it&apos;s not a prediction. It&apos;s a schedule.
               </p>
-              <CheckoutButton className="inline-flex items-center gap-2 bg-white text-surface-900 font-semibold px-8 py-3.5 rounded-xl text-sm mt-6 hover:bg-surface-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+              <a href="#pricing" className="inline-flex items-center gap-2 bg-white text-surface-900 font-semibold px-8 py-3.5 rounded-xl text-sm mt-6 hover:bg-surface-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
                 Don&apos;t wait for the memo. Join Outraro.
-              </CheckoutButton>
+              </a>
             </div>
           </div>
         </div>
@@ -144,9 +144,9 @@ export default function HomePage() {
             <p className="text-surface-600 text-lg leading-relaxed"><span className="text-red-600 font-semibold">4 in 10 workers</span> now report anxiety about AI replacing their jobs. Among SDRs, it&apos;s worse. The tools replacing them are already live, already deployed, and already beating their numbers.</p>
           </div>
           <div className="text-center mt-12">
-            <CheckoutButton className="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-10 py-4 rounded-xl text-lg glow-btn inline-flex items-center justify-center gap-2 transition-all">
+            <a href="#pricing" className="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-10 py-4 rounded-xl text-lg glow-btn inline-flex items-center justify-center gap-2 transition-all">
               Learn More About The Membership <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-            </CheckoutButton>
+            </a>
           </div>
         </div>
       </section>
@@ -230,9 +230,9 @@ export default function HomePage() {
             </div>
           </div>
           <div className="text-center mt-12">
-            <CheckoutButton className="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-10 py-4 rounded-xl text-lg glow-btn inline-flex items-center justify-center gap-2 transition-all">
+            <a href="#pricing" className="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-10 py-4 rounded-xl text-lg glow-btn inline-flex items-center justify-center gap-2 transition-all">
               Learn More About The Membership <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-            </CheckoutButton>
+            </a>
           </div>
         </div>
       </section>
