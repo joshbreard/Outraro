@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
+import SalesProfileEditor from "@/components/sales-profile-editor";
 
 export default function AccountPage() {
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -25,7 +25,6 @@ export default function AccountPage() {
       setError("Failed to update password. Please try again.");
     } else {
       setMessage("Password updated successfully.");
-      setCurrentPassword("");
       setNewPassword("");
     }
     setLoading(false);
@@ -51,6 +50,8 @@ export default function AccountPage() {
       <h2 className="text-2xl font-bold text-surface-900 mb-8">
         Account Settings
       </h2>
+
+      <SalesProfileEditor />
 
       <div className="bg-white border border-surface-200 rounded-2xl p-6 mb-6">
         <h3 className="text-lg font-semibold text-surface-900 mb-4">

@@ -1,8 +1,7 @@
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
-import DashboardShell from "@/components/DashboardShell";
 
-export default async function LibraryLayout({
+export default async function OnboardingLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -28,9 +27,7 @@ export default async function LibraryLayout({
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!salesProfile) redirect("/onboarding");
+  if (salesProfile) redirect("/library");
 
-  return (
-    <DashboardShell userEmail={user.email ?? ""}>{children}</DashboardShell>
-  );
+  return <>{children}</>;
 }

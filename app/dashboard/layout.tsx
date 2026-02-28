@@ -2,9 +2,15 @@ import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import DashboardShell from "@/components/DashboardShell";
 
-export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) redirect("/login");
 
@@ -16,5 +22,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   if (profile?.subscription_status !== "active") redirect("/#pricing");
 
-  return <DashboardShell userEmail={user.email ?? ""}>{children}</DashboardShell>;
+  const { data: salesProfile } = await supabase
+    .from("sales_profiles")
+    .select("id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (!salesProfile) redirect("/onboarding");
+
+  return (
+    <DashboardShell userEmail={user.email ?? ""}>{children}</DashboardShell>
+  );
 }
