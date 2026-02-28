@@ -1,6 +1,8 @@
 import { getPublishedContent } from "@/lib/notion";
+import Link from "next/link";
+import Image from "next/image";
 
-export const revalidate = 3600; // Refresh from Notion every hour
+export const revalidate = 3600;
 
 const categoryColors: Record<string, string> = {
   "Tool Breakdown": "bg-blue-50 text-blue-700 border-blue-200",
@@ -53,31 +55,36 @@ function ContentCard({
   item,
   compact = false,
 }: {
-  item: { id: string; title: string; category: string; summary: string; videoUrl: string | null; publishedDate: string };
+  item: { id: string; title: string; category: string; summary: string; videoUrl: string | null; imageUrl: string | null; publishedDate: string };
   compact?: boolean;
 }) {
   const colorClass = categoryColors[item.category] ?? categoryColors["General"];
 
   return (
-    <div className="bg-white border border-surface-200 rounded-2xl p-6 hover:shadow-md transition-all">
-      <div className="flex items-center gap-3 mb-3">
-        <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${colorClass}`}>{item.category}</span>
-        <span className="text-xs text-surface-400">
-          {new Date(item.publishedDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-        </span>
+    <Link href={`/dashboard/content/${item.id}`} className="block">
+      <div className="bg-white border border-surface-200 rounded-2xl overflow-hidden hover:shadow-md transition-all cursor-pointer">
+        {item.imageUrl && (
+          <div className="relative w-full aspect-[2/1]">
+            <Image src={item.imageUrl} alt={item.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+          </div>
+        )}
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-3">
+            <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${colorClass}`}>{item.category}</span>
+            <span className="text-xs text-surface-400">
+              {new Date(item.publishedDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+            </span>
+          </div>
+          <h3 className={`font-bold text-surface-900 mb-2 ${compact ? "text-base" : "text-lg"}`}>{item.title}</h3>
+          {item.summary && <p className="text-surface-500 text-sm leading-relaxed">{item.summary}</p>}
+          <span className="inline-flex items-center gap-1 text-brand-600 text-sm font-medium mt-3">
+            Read more
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </span>
+        </div>
       </div>
-      <h3 className={`font-bold text-surface-900 mb-2 ${compact ? "text-base" : "text-lg"}`}>{item.title}</h3>
-      {item.summary && <p className="text-surface-500 text-sm leading-relaxed">{item.summary}</p>}
-      {item.videoUrl && (
-        <a href={item.videoUrl} target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-brand-600 hover:text-brand-700 text-sm font-medium mt-3 transition-colors">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          Watch walkthrough
-        </a>
-      )}
-    </div>
+    </Link>
   );
 }
