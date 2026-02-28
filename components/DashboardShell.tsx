@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createBrowserClient } from "@/lib/supabase-browser";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 const navigation = [
   { name: "This Week", href: "/dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4" },
@@ -16,13 +15,6 @@ const navigation = [
 export default function DashboardShell({ children, userEmail }: { children: React.ReactNode; userEmail: string }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    const supabase = createBrowserClient();
-    await supabase.auth.signOut();
-    router.push("/login");
-  };
 
   return (
     <div className="min-h-screen bg-surface-100 flex">
@@ -54,25 +46,6 @@ export default function DashboardShell({ children, userEmail }: { children: Reac
             );
           })}
         </nav>
-
-        <div className="p-4 border-t border-surface-200">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center">
-              <span className="text-xs font-bold text-brand-700">{userEmail.charAt(0).toUpperCase()}</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs text-surface-900 font-medium truncate">{userEmail}</p>
-              <p className="text-xs text-surface-400">Active member</p>
-            </div>
-          </div>
-          <button onClick={handleLogout}
-            className="w-full flex items-center gap-2 text-surface-500 hover:text-red-600 text-sm py-2 px-3 rounded-lg hover:bg-red-50 transition-all cursor-pointer">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            Sign out
-          </button>
-        </div>
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">

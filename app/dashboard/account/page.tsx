@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createBrowserClient } from "@/lib/supabase-browser";
+import { useRouter } from "next/navigation";
 
 export default function AccountPage() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -10,6 +11,7 @@ export default function AccountPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const supabase = createBrowserClient();
+  const router = useRouter();
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +41,11 @@ export default function AccountPage() {
     }
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
   return (
     <div className="max-w-2xl">
       <h2 className="text-2xl font-bold text-surface-900 mb-8">Account Settings</h2>
@@ -63,12 +70,25 @@ export default function AccountPage() {
       </div>
 
       {/* Manage Subscription */}
-      <div className="bg-white border border-surface-200 rounded-2xl p-6">
+      <div className="bg-white border border-surface-200 rounded-2xl p-6 mb-6">
         <h3 className="text-lg font-semibold text-surface-900 mb-2">Subscription</h3>
         <p className="text-surface-500 text-sm mb-4">Manage your billing, update payment method, or cancel your subscription through Stripe's secure portal.</p>
         <button onClick={handleManageBilling}
           className="border border-surface-300 hover:border-surface-400 text-surface-700 hover:text-surface-900 font-semibold py-3 px-6 rounded-xl text-sm transition-all cursor-pointer">
           Manage Billing
+        </button>
+      </div>
+
+      {/* Sign Out */}
+      <div className="bg-white border border-surface-200 rounded-2xl p-6">
+        <h3 className="text-lg font-semibold text-surface-900 mb-2">Sign Out</h3>
+        <p className="text-surface-500 text-sm mb-4">Sign out of your Outraro account on this device.</p>
+        <button onClick={handleLogout}
+          className="flex items-center gap-2 border border-red-200 hover:border-red-300 text-red-600 hover:text-red-700 hover:bg-red-50 font-semibold py-3 px-6 rounded-xl text-sm transition-all cursor-pointer">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Sign Out
         </button>
       </div>
     </div>
