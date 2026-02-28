@@ -1,74 +1,81 @@
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import ToolDiscovery from "@/components/tool-discovery";
-import { toolCatalog, type Tool } from "@/lib/tool-catalog";
+import { TOOL_CATALOG, type Tool } from "@/lib/tool-catalog";
 
 export const dynamic = "force-dynamic";
 
 function getRecommendations(profile: any): Tool[] {
-  if (!profile) return [];
   const recs: Tool[] = [];
-  const toolsUsed = (profile.tools_used || "").toLowerCase();
-  const channels = (profile.outreach_channels || "").toLowerCase();
-  const challenge = (profile.biggest_challenge || "").toLowerCase();
 
-  if (
-    !toolsUsed.includes("apollo") &&
-    !toolsUsed.includes("salesloft") &&
-    !toolsUsed.includes("outreach") &&
-    !toolsUsed.includes("lemlist")
-  ) {
-    const rec = toolCatalog.find((t) => t.slug === "apollo");
-    if (rec) recs.push(rec);
-  }
+  const channels = (profile?.outreach_channels || "").toLowerCase();
+  const tools = (profile?.tools_used || "").toLowerCase();
+  const challenge = (profile?.biggest_challenge || "").toLowerCase();
+  const crm = (profile?.crm_used || "").toLowerCase();
 
+  // If they do cold email but don't have an email infra tool
   if (
     channels.includes("email") &&
-    !toolsUsed.includes("instantly") &&
-    !toolsUsed.includes("smartlead")
+    !tools.includes("instantly") &&
+    !tools.includes("smartlead")
   ) {
-    const rec = toolCatalog.find((t) => t.slug === "instantly");
-    if (rec) recs.push(rec);
+    const t = TOOL_CATALOG.find((t) => t.slug === "instantly");
+    if (t) recs.push(t);
   }
 
+  // If they do LinkedIn but don't mention Sales Nav
   if (
     channels.includes("linkedin") &&
-    !toolsUsed.includes("taplio") &&
-    !toolsUsed.includes("sales nav")
+    !tools.includes("sales nav") &&
+    !tools.includes("navigator")
   ) {
-    const rec = toolCatalog.find((t) => t.slug === "linkedin-sales-nav");
-    if (rec) recs.push(rec);
+    const t = TOOL_CATALOG.find((t) => t.slug === "linkedin-sales-navigator");
+    if (t) recs.push(t);
   }
 
-  if (
-    channels.includes("call") &&
-    !toolsUsed.includes("orum") &&
-    !toolsUsed.includes("nooks")
-  ) {
-    const rec = toolCatalog.find((t) => t.slug === "nooks");
-    if (rec) recs.push(rec);
-  }
-
+  // If challenge mentions data or leads
   if (
     challenge.includes("data") ||
-    challenge.includes("contact") ||
-    challenge.includes("lead")
+    challenge.includes("lead") ||
+    challenge.includes("prospect")
   ) {
-    const rec = toolCatalog.find((t) => t.slug === "clay");
-    if (rec && !recs.find((r) => r.slug === rec.slug)) recs.push(rec);
+    const t = TOOL_CATALOG.find((t) => t.slug === "clay");
+    if (t && !recs.find((r) => r.slug === t.slug)) recs.push(t);
   }
 
-  if (challenge.includes("personal") || challenge.includes("relevance")) {
-    const rec = toolCatalog.find((t) => t.slug === "lavender");
-    if (rec && !recs.find((r) => r.slug === rec.slug)) recs.push(rec);
-  }
-
+  // If challenge mentions personalization or response rates
   if (
-    !toolsUsed.includes("hubspot") &&
-    !toolsUsed.includes("salesforce") &&
-    !toolsUsed.includes("pipedrive")
+    challenge.includes("personal") ||
+    challenge.includes("response") ||
+    challenge.includes("reply")
   ) {
-    const rec = toolCatalog.find((t) => t.slug === "hubspot");
-    if (rec && !recs.find((r) => r.slug === rec.slug)) recs.push(rec);
+    const t = TOOL_CATALOG.find((t) => t.slug === "lavender");
+    if (t && !recs.find((r) => r.slug === t.slug)) recs.push(t);
+  }
+
+  // If they do calling but don't have a dialer
+  if (
+    channels.includes("call") &&
+    !tools.includes("orum") &&
+    !tools.includes("nooks")
+  ) {
+    const t = TOOL_CATALOG.find((t) => t.slug === "nooks");
+    if (t && !recs.find((r) => r.slug === t.slug)) recs.push(t);
+  }
+
+  // If no CRM mentioned, suggest HubSpot
+  if (!crm && !tools.includes("hubspot") && !tools.includes("salesforce")) {
+    const t = TOOL_CATALOG.find((t) => t.slug === "hubspot");
+    if (t && !recs.find((r) => r.slug === t.slug)) recs.push(t);
+  }
+
+  // Default recommendations if profile is sparse
+  if (recs.length === 0) {
+    const defaults = ["apollo", "clay", "instantly", "lavender"];
+    for (const slug of defaults) {
+      const t = TOOL_CATALOG.find((t) => t.slug === slug);
+      if (t) recs.push(t);
+      if (recs.length >= 4) break;
+    }
   }
 
   return recs.slice(0, 4);
@@ -80,27 +87,17 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let profile = null;
+  let recommendations: Tool[] = [];
+
   if (user) {
-    const { data } = await supabase
+    const { data: profile } = await supabase
       .from("sales_profiles")
       .select("*")
       .eq("user_id", user.id)
       .maybeSingle();
-    profile = data;
+
+    recommendations = getRecommendations(profile);
   }
 
-  const recommendations = getRecommendations(profile);
-  const profileComplete = !!(
-    profile &&
-    profile.product_description &&
-    profile.target_titles
-  );
-
-  return (
-    <ToolDiscovery
-      recommendations={recommendations}
-      profileComplete={profileComplete}
-    />
-  );
+  return <ToolDiscovery recommendations={recommendations} />;
 }
