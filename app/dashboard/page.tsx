@@ -61,7 +61,7 @@ function ContentCard({
   const colorClass = categoryColors[item.category] ?? categoryColors["General"];
 
   return (
-    <Link href={`/dashboard/content/${item.id}`} className="block">
+    <Link href={`/dashboard/content/${item.id}`} className="block no-underline">
       <div className="bg-white border border-surface-200 rounded-2xl overflow-hidden hover:shadow-md transition-all cursor-pointer">
         {item.imageUrl && (
           <div className="relative w-full aspect-[2/1]">
@@ -77,12 +77,6 @@ function ContentCard({
           </div>
           <h3 className={`font-bold text-surface-900 mb-2 ${compact ? "text-base" : "text-lg"}`}>{item.title}</h3>
           {item.summary && <p className="text-surface-500 text-sm leading-relaxed">{item.summary}</p>}
-          <span className="inline-flex items-center gap-1 text-brand-600 text-sm font-medium mt-3">
-            Read more
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </span>
         </div>
       </div>
     </Link>

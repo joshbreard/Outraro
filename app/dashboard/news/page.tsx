@@ -30,7 +30,7 @@ export default async function NewsPage() {
       ) : (
         <div className="space-y-4">
           {content.map((item) => (
-            <Link key={item.id} href={`/dashboard/content/${item.id}`} className="block">
+            <Link key={item.id} href={`/dashboard/content/${item.id}`} className="block no-underline">
               <div className="bg-white border border-surface-200 rounded-2xl overflow-hidden hover:shadow-md transition-all cursor-pointer">
                 {item.imageUrl && (
                   <div className="relative w-full aspect-[2/1]">
@@ -46,12 +46,6 @@ export default async function NewsPage() {
                   </div>
                   <h3 className="text-lg font-bold text-surface-900 mb-2">{item.title}</h3>
                   {item.summary && <p className="text-surface-500 text-sm leading-relaxed">{item.summary}</p>}
-                  <span className="inline-flex items-center gap-1 text-brand-600 text-sm font-medium mt-3">
-                    Read more
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </span>
                 </div>
               </div>
             </Link>
