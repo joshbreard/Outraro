@@ -67,7 +67,9 @@ export default function ContentLibrary({
     <div className="max-w-5xl">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-surface-900 mb-1">Library</h1>
-        <p className="text-surface-500 text-sm">Browse all playbooks, prompts, tools, and news.</p>
+        <p className="text-surface-500 text-sm">
+          Browse all playbooks, prompts, tools, and news.
+        </p>
       </div>
 
       {/* Search bar */}
@@ -97,8 +99,18 @@ export default function ContentLibrary({
             onClick={() => setSearch("")}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600 transition-colors cursor-pointer"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         )}
@@ -135,7 +147,9 @@ export default function ContentLibrary({
           <div className="mb-10">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-              <h2 className="text-lg font-bold text-surface-900">New This Week</h2>
+              <h2 className="text-lg font-bold text-surface-900">
+                New This Week
+              </h2>
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               {newThisWeek.map((item) => (
@@ -145,7 +159,9 @@ export default function ContentLibrary({
           </div>
           {older.length > 0 && (
             <div>
-              <h2 className="text-lg font-bold text-surface-900 mb-4">Earlier</h2>
+              <h2 className="text-lg font-bold text-surface-900 mb-4">
+                Earlier
+              </h2>
               <div className="grid md:grid-cols-2 gap-4">
                 {older.map((item) => (
                   <ContentCard key={item.id} item={item} />
@@ -170,10 +186,7 @@ function ContentCard({ item }: { item: ContentItem }) {
     categoryColors[item.category] ?? categoryColors["General"];
 
   return (
-    <Link
-      href={`/dashboard/content/${item.id}`}
-      className="block no-underline"
-    >
+    <Link href={`/library/${item.id}`} className="block no-underline">
       <div className="bg-white border border-surface-200 rounded-2xl overflow-hidden hover:shadow-md transition-all cursor-pointer h-full flex flex-col">
         {item.imageUrl && (
           <div className="relative w-full aspect-[16/9]">

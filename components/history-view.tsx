@@ -136,7 +136,7 @@ export default function HistoryView({
                     className="bg-white border border-surface-200 rounded-xl p-4 flex items-center gap-4 hover:shadow-sm transition-all"
                   >
                     <Link
-                      href={`/dashboard/content/${article.article_id}`}
+                      href={`/library/${article.article_id}`}
                       className="flex-1 min-w-0 no-underline"
                     >
                       <div className="flex items-center gap-3 mb-1">
@@ -254,7 +254,10 @@ export default function HistoryView({
                     {isExpanded && (
                       <div className="border-t border-surface-200 p-4 space-y-3 bg-surface-50">
                         {convo.messages.map(
-                          (m: { role: string; content: string }, i: number) => (
+                          (
+                            m: { role: string; content: string },
+                            i: number
+                          ) => (
                             <div
                               key={i}
                               className={`flex ${
@@ -278,7 +281,7 @@ export default function HistoryView({
                         {convo.article_id && (
                           <div className="pt-2">
                             <Link
-                              href={`/dashboard/content/${convo.article_id}`}
+                              href={`/library/${convo.article_id}`}
                               className="text-xs text-brand-600 hover:text-brand-700 font-medium no-underline hover:underline"
                             >
                               View article &rarr;

@@ -30,8 +30,8 @@ export default async function ContentDetail({
         <h1 className="text-2xl font-bold text-surface-900 mb-4">
           Content not found
         </h1>
-        <Link href="/dashboard" className="text-brand-600 hover:underline">
-          Back to dashboard
+        <Link href="/library" className="text-brand-600 hover:underline">
+          Back to Library
         </Link>
       </div>
     );
