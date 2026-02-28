@@ -1,34 +1,61 @@
-import { generateText } from "ai";
+import { streamText } from "ai";
 import { openai } from "@/lib/openai";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { getToolBySlug } from "@/lib/tool-catalog";
 
 export const maxDuration = 60;
 
+function buildProfileContext(profile: any): string {
+  const parts: string[] = [];
+  if (profile.product_description) parts.push(`Product: ${profile.product_description}`);
+  if (profile.industry) parts.push(`Industry: ${profile.industry}`);
+  if (profile.target_titles) parts.push(`Target buyers: ${profile.target_titles}`);
+  if (profile.company_size) parts.push(`Target company size: ${profile.company_size}`);
+  if (profile.outreach_channels) parts.push(`Outreach channels: ${profile.outreach_channels}`);
+  if (profile.experience_level) {
+    const levels: Record<string, string> = {
+      new: "Brand new SDR (0-3 months)",
+      getting_started: "Getting started (3-12 months)",
+      experienced: "Experienced SDR (1-3 years)",
+      veteran: "Veteran SDR (3+ years)",
+    };
+    parts.push(`Experience: ${levels[profile.experience_level] || profile.experience_level}`);
+  }
+  if (profile.biggest_challenge) parts.push(`Biggest challenge: ${profile.biggest_challenge}`);
+  if (profile.tools_used) parts.push(`Tools they use: ${profile.tools_used}`);
+  if (profile.crm_used) parts.push(`CRM: ${profile.crm_used}`);
+  if (profile.team_size) parts.push(`Team size: ${profile.team_size}`);
+  return parts.join("\n");
+}
+
 export async function POST(req: Request) {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+
   const { toolSlug, refresh } = await req.json();
   const tool = getToolBySlug(toolSlug);
   if (!tool) return Response.json({ error: "Tool not found" }, { status: 404 });
 
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
-
+  // Check cache (unless refresh requested)
   if (!refresh) {
     const { data: cached } = await supabase
       .from("tool_guides")
-      .select("guide_content")
+      .select("guide_content, updated_at")
       .eq("user_id", user.id)
       .eq("tool_slug", toolSlug)
       .maybeSingle();
 
     if (cached) {
-      return Response.json({ guide: cached.guide_content, cached: true });
+      return Response.json({
+        guide: cached.guide_content,
+        cached: true,
+        updatedAt: cached.updated_at,
+      });
     }
   }
 
+  // Load profile + memory for personalization
   const { data: profile } = await supabase
     .from("sales_profiles")
     .select("*")
@@ -41,71 +68,93 @@ export async function POST(req: Request) {
     .eq("user_id", user.id)
     .maybeSingle();
 
-  const profileParts: string[] = [];
-  if (profile) {
-    if (profile.product_description)
-      profileParts.push(`Product: ${profile.product_description}`);
-    if (profile.industry) profileParts.push(`Industry: ${profile.industry}`);
-    if (profile.target_titles)
-      profileParts.push(`Target buyers: ${profile.target_titles}`);
-    if (profile.company_size)
-      profileParts.push(`Target company size: ${profile.company_size}`);
-    if (profile.outreach_channels)
-      profileParts.push(`Outreach channels: ${profile.outreach_channels}`);
-    if (profile.experience_level) {
-      const levels: Record<string, string> = {
-        new: "Brand new SDR (0-3 months)",
-        getting_started: "Getting started (3-12 months)",
-        experienced: "Experienced SDR (1-3 years)",
-        veteran: "Veteran SDR (3+ years)",
-      };
-      profileParts.push(
-        `Experience: ${
-          levels[profile.experience_level] || profile.experience_level
-        }`
-      );
-    }
-    if (profile.biggest_challenge)
-      profileParts.push(`Biggest challenge: ${profile.biggest_challenge}`);
-    if (profile.tools_used)
-      profileParts.push(`Current tools: ${profile.tools_used}`);
-    if (profile.crm_used) profileParts.push(`CRM: ${profile.crm_used}`);
-  }
+  const profileContext = profile ? buildProfileContext(profile) : "No profile set up yet.";
+  const memoryContext = memory?.content || "No memory context yet.";
 
-  const systemPrompt = `You are Bolt, the AI sales coach inside Outraro. Generate a personalized guide for the SDR tool "${tool.name}" (${tool.url}).
+  const systemPrompt = `You are Bolt, the AI sales coach inside Outraro. Generate a comprehensive, personalized guide for the tool "${tool.name}" (${tool.url}).
 
-Tool: ${tool.name}
+Tool description: ${tool.oneLiner}
 Category: ${tool.category}
-Description: ${tool.oneLiner}
-${profileParts.length > 0 ? `\nUser Profile:\n${profileParts.join("\n")}` : "\nNo profile data available. Write a general guide."}
-${memory?.content ? `\nUser Memory (accumulated context from past interactions):\n${memory.content}` : ""}
 
-Write a comprehensive, personalized guide in HTML format. Use clean semantic HTML with h2, h3, p, ul, li, strong tags.
+User's Sales Profile:
+${profileContext}
 
-Structure the guide with these sections:
-1. <h2>What ${tool.name} Does</h2> - brief overview tailored to their situation
-2. <h2>Why It Matters for You</h2> - reference their specific product, ICP, channels, and challenges
-3. <h2>How to Get Started</h2> - step-by-step setup specific to their workflow
-4. <h2>Pro Tips</h2> - 3-4 actionable tips based on their experience level
-5. <h2>How It Fits Your Stack</h2> - reference their existing tools and how ${tool.name} integrates
+User's Memory/Context:
+${memoryContext}
 
-Keep it concise and actionable. Use <strong> for emphasis. Use <ul> and <li> for lists. No fluff. Every sentence should be useful. If profile is sparse, write a strong general guide.`;
+Write a guide with the following sections in markdown:
 
-  const { text } = await generateText({
+## What ${tool.name} Does
+A 2-3 sentence overview tailored to their role and experience level.
+
+## Why It Matters for You
+Explain specifically why this tool is relevant given their product, ICP, outreach channels, and challenges. Reference their specific situation.
+
+## Getting Started
+Step-by-step setup instructions. If they already use tools that integrate with this one (check their tools_used and CRM), mention those integrations specifically.
+
+## Pro Tips for Your Use Case
+3-5 actionable tips tailored to their industry, target buyers, and experience level. Be specific, not generic.
+
+## How It Fits Your Stack
+Explain how this tool works alongside the other tools they already use. Mention specific integrations and workflows.
+
+Keep it concise but actionable. Use short paragraphs. Write like a senior sales ops person advising a colleague, not a marketing page.`;
+
+  const result = await streamText({
     model: openai("gpt-4o"),
-    prompt: systemPrompt,
+    system: systemPrompt,
+    messages: [{ role: "user", content: `Generate my personalized guide for ${tool.name}.` }],
   });
 
-  await supabase.from("tool_guides").upsert(
-    {
-      user_id: user.id,
-      tool_slug: toolSlug,
-      tool_name: tool.name,
-      guide_content: text,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id,tool_slug" }
-  );
+  // Collect the full text to cache it
+  let fullText = "";
+  const stream = result.toDataStream();
+  const reader = stream.getReader();
+  const decoder = new TextDecoder();
+  const chunks: Uint8Array[] = [];
 
-  return Response.json({ guide: text, cached: false });
+  // We need to tee the stream: one for caching, one for the response
+  // Instead, collect full text after streaming
+  const transformStream = new TransformStream({
+    transform(chunk, controller) {
+      chunks.push(chunk);
+      controller.enqueue(chunk);
+    },
+    async flush() {
+      const fullResponse = chunks.map((c) => decoder.decode(c, { stream: true })).join("");
+      // Extract just the text content from the data stream format
+      const textParts = fullResponse
+        .split("\n")
+        .filter((line) => line.startsWith('0:"'))
+        .map((line) => {
+          try {
+            return JSON.parse(line.slice(2));
+          } catch {
+            return "";
+          }
+        })
+        .join("");
+
+      if (textParts) {
+        await supabase.from("tool_guides").upsert(
+          {
+            user_id: user.id,
+            tool_slug: toolSlug,
+            tool_name: tool.name,
+            guide_content: textParts,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "user_id,tool_slug" }
+        );
+      }
+    },
+  });
+
+  return new Response(stream.pipeThrough(transformStream), {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "X-Vercel-AI-Data-Stream": "v1",
+    },
+  });
 }
