@@ -115,7 +115,7 @@ PERSONALIZATION:
 ${channelInstructions[channel]}`;
 
   const result = await generateText({
-    model: openai("gpt-4.5-preview"),
+    model: openai("gpt-4.1"),
     system: systemPrompt,
     prompt: `Write ${channel} outreach messages for ${prospectName || "this prospect"}${prospectCompany ? ` at ${prospectCompany}` : ""}${prospectRole ? ` (${prospectRole})` : ""}.${prospectContext ? ` Context: ${prospectContext}` : ""}`,
   });
