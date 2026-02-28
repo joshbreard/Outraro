@@ -1,8 +1,8 @@
 export const categoryRouteMap: Record<string, string> = {
-  "Tool Breakdown": "/dashboard/tools",
-  Workflow: "/dashboard/workflows",
-  "News Brief": "/dashboard/news",
-  "Prompt Library": "/dashboard/prompts",
+  "Tool Breakdown": "/dashboard/content",
+  Workflow: "/dashboard/content",
+  "News Brief": "/dashboard/content",
+  "Prompt Library": "/dashboard/content",
 };
 
 export const categoryLabelMap: Record<string, string> = {
@@ -13,6 +13,5 @@ export const categoryLabelMap: Record<string, string> = {
 };
 
 export function getCategoryRoute(category: string, id: string): string {
-  const base = categoryRouteMap[category] ?? "/dashboard";
-  return `${base}/${id}`;
+  return `/dashboard/content/${id}`;
 }
