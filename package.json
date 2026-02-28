@@ -16,7 +16,9 @@
     "@supabase/supabase-js": "^2.47.0",
     "@supabase/ssr": "^0.6.0",
     "resend": "^4.1.0",
-    "@notionhq/client": "^2.3.0"
+    "@notionhq/client": "^2.3.0",
+    "ai": "^4.0.0",
+    "@ai-sdk/openai": "^1.0.0"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

@@ -1,6 +1,7 @@
 import { getPublishedContent, getPageContent } from "@/lib/notion";
 import Image from "next/image";
 import Link from "next/link";
+import RoChat from "@/components/ro-chat";
 
 const categoryColors: Record<string, string> = {
   "Tool Breakdown": "bg-blue-50 text-blue-700 border-blue-200",
@@ -39,68 +40,72 @@ export default async function ContentDetail({
   const colorClass = categoryColors[item.category] ?? categoryColors["General"];
 
   return (
-    <div className="max-w-3xl">
-      <Link
-        href={backHref}
-        className="inline-flex items-center gap-1 text-surface-500 hover:text-surface-700 text-sm mb-6 transition-colors"
-      >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+    <>
+      <div className="max-w-3xl">
+        <Link
+          href={backHref}
+          className="inline-flex items-center gap-1 text-surface-500 hover:text-surface-700 text-sm mb-6 transition-colors"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-        {backLabel}
-      </Link>
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          {backLabel}
+        </Link>
 
-      {item.imageUrl && (
-        <div className="relative w-full aspect-[2/1] rounded-2xl overflow-hidden mb-8">
-          <Image
-            src={item.imageUrl}
-            alt={item.title}
-            fill
-            className="object-cover"
-            sizes="100vw"
-            priority
-          />
+        {item.imageUrl && (
+          <div className="relative w-full aspect-[2/1] rounded-2xl overflow-hidden mb-8">
+            <Image
+              src={item.imageUrl}
+              alt={item.title}
+              fill
+              className="object-cover"
+              sizes="100vw"
+              priority
+            />
+          </div>
+        )}
+
+        <div className="flex items-center gap-3 mb-4">
+          <span
+            className={`text-xs font-semibold px-3 py-1 rounded-full border ${colorClass}`}
+          >
+            {item.category}
+          </span>
+          <span className="text-xs text-surface-400">
+            {new Date(item.publishedDate).toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </span>
         </div>
-      )}
 
-      <div className="flex items-center gap-3 mb-4">
-        <span
-          className={`text-xs font-semibold px-3 py-1 rounded-full border ${colorClass}`}
-        >
-          {item.category}
-        </span>
-        <span className="text-xs text-surface-400">
-          {new Date(item.publishedDate).toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          })}
-        </span>
+        <h1 className="text-3xl font-bold text-surface-900 mb-4">
+          {item.title}
+        </h1>
+        {item.summary && (
+          <p className="text-lg text-surface-500 leading-relaxed mb-8">
+            {item.summary}
+          </p>
+        )}
+
+        <div
+          className="border-t border-surface-200 pt-8"
+          dangerouslySetInnerHTML={{ __html: bodyHtml }}
+        />
       </div>
 
-      <h1 className="text-3xl font-bold text-surface-900 mb-4">
-        {item.title}
-      </h1>
-      {item.summary && (
-        <p className="text-lg text-surface-500 leading-relaxed mb-8">
-          {item.summary}
-        </p>
-      )}
-
-      <div
-        className="border-t border-surface-200 pt-8"
-        dangerouslySetInnerHTML={{ __html: bodyHtml }}
-      />
-    </div>
+      <RoChat articleId={id} articleTitle={item.title} />
+    </>
   );
 }
