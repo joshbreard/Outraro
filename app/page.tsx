@@ -32,7 +32,7 @@ export default function HomePage() {
             <div>
               <div className="inline-flex items-center gap-2 bg-brand-50 border border-brand-100 rounded-full px-4 py-2 mb-8">
                 <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                <span className="text-sm text-brand-700 font-medium">Updated weekly with the latest AI tools & workflows</span>
+                <span className="text-sm text-brand-700 font-medium">Updated daily with the latest AI tools & workflows</span>
               </div>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-6 text-surface-900">
                 AI is coming for your<span className="gradient-text"> SDR seat.</span>
@@ -199,7 +199,7 @@ export default function HomePage() {
           <div className="max-w-3xl mx-auto text-center mb-16">
             <span className="text-brand-600 text-sm font-semibold uppercase tracking-widest">What&apos;s Inside Outraro</span>
             <h2 className="text-3xl md:text-5xl font-bold mt-4 mb-6 text-surface-900">The AI toolkit<br/>your company won&apos;t teach you</h2>
-            <p className="text-surface-500 text-lg">Every month, we break down the tools reshaping B2B sales with hands-on walkthroughs, real workflows, and zero fluff.</p>
+            <p className="text-surface-500 text-lg">Every day, we break down the tools reshaping B2B sales with hands-on walkthroughs, real workflows, and zero fluff.</p>
           </div>
           <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
             {[
@@ -219,9 +219,9 @@ export default function HomePage() {
             ))}
           </div>
           <div className="max-w-3xl mx-auto bg-white border border-surface-200 rounded-2xl p-8 md:p-10 shadow-sm">
-            <h3 className="text-xl font-bold mb-6 text-center text-surface-900">Every month, members get:</h3>
+            <h3 className="text-xl font-bold mb-6 text-center text-surface-900">Every day, members get:</h3>
             <div className="grid sm:grid-cols-2 gap-4">
-              {["Deep-dive video walkthroughs of every tool", "Copy-paste prompt libraries for sales use cases", "Plug-and-play workflow templates", "\"What's real vs. hype\" tool scorecards", "Weekly AI news brief: what changed this week"].map((item) => (
+              {["Deep-dive walkthroughs of every tool", "Copy-paste prompt libraries for sales use cases", "Plug-and-play workflow templates", "\"What's real vs. hype\" tool scorecards", "Daily AI news brief: what changed today"].map((item) => (
                 <div key={item} className="flex items-start gap-3">
                   <svg className="w-5 h-5 text-brand-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                   <span className="text-surface-600 text-sm">{item}</span>
@@ -255,7 +255,7 @@ export default function HomePage() {
             </div>
             <div className="bg-white border border-surface-200 rounded-2xl overflow-hidden card-hover shadow-sm">
               <div className="w-full h-48 bg-gradient-to-br from-brand-50 to-brand-100 flex items-center justify-center"><div className="text-center"><div className="text-6xl font-black text-brand-600">1st</div><div className="text-sm text-brand-500 font-medium mt-1">First to know. First to deploy.</div></div></div>
-              <div className="p-6 text-center"><div className="text-4xl font-black text-brand-600 mb-2">1st</div><h4 className="text-lg font-semibold mb-2 text-surface-900">First-Mover Edge</h4><p className="text-surface-500 text-sm">New tools drop weekly. Members learn about them before their VP reads about them on LinkedIn.</p></div>
+              <div className="p-6 text-center"><div className="text-4xl font-black text-brand-600 mb-2">1st</div><h4 className="text-lg font-semibold mb-2 text-surface-900">First-Mover Edge</h4><p className="text-surface-500 text-sm">New tools drop daily. Members learn about them before their VP reads about them on LinkedIn.</p></div>
             </div>
           </div>
         </div>
@@ -274,11 +274,11 @@ export default function HomePage() {
               <div className="flex justify-center mb-6"><span className="bg-brand-50 text-brand-700 text-xs font-semibold px-4 py-1.5 rounded-full border border-brand-200">MOST POPULAR</span></div>
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold mb-2 text-surface-900">Outraro Membership</h3>
-                <div className="flex items-baseline justify-center gap-1"><span className="text-5xl md:text-6xl font-black text-surface-900">$99</span><span className="text-surface-500 text-lg">/month</span></div>
+                <div className="flex items-baseline justify-center gap-1"><span className="text-5xl md:text-6xl font-black text-surface-900">$59</span><span className="text-surface-500 text-lg">/month</span></div>
                 <p className="text-surface-400 text-sm mt-2">Cancel anytime. No contracts.</p>
               </div>
               <div className="space-y-4 mb-8">
-                {["Full access to all AI tool breakdowns & walkthroughs", "Monthly workflow templates & prompt libraries", 'Weekly "What Changed This Week" AI news brief', "Tool scorecards: what's real vs. what's hype"].map((item) => (
+                {["Full access to all AI tool breakdowns & walkthroughs", "Daily workflow templates & prompt libraries", 'Daily "What Changed Today" AI news brief', "Tool scorecards: what's real vs. what's hype"].map((item) => (
                   <div key={item} className="flex items-start gap-3">
                     <svg className="w-5 h-5 text-brand-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                     <span className="text-surface-600 text-sm">{item}</span>
@@ -290,7 +290,7 @@ export default function HomePage() {
             </div></div>
           </div>
           <div className="max-w-lg mx-auto mt-8 text-center">
-            <p className="text-surface-400 text-sm">The average SDR salary is $55,000/year. If this membership keeps you employed even one extra month, it paid for itself <span className="text-surface-700 font-medium">46x over</span>.</p>
+            <p className="text-surface-400 text-sm">The average SDR salary is $55,000/year. If this membership keeps you employed even one extra month, it paid for itself <span className="text-surface-700 font-medium">78x over</span>.</p>
           </div>
         </div>
       </section>
@@ -315,7 +315,7 @@ export default function HomePage() {
           <CheckoutButton className="inline-flex items-center gap-2 bg-white hover:bg-surface-100 text-surface-900 font-semibold px-10 py-5 rounded-xl text-lg transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
             Join Outraro Today <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
           </CheckoutButton>
-          <p className="text-zinc-500 text-sm mt-6">$99/mo | Cancel anytime | Updated weekly</p>
+          <p className="text-zinc-500 text-sm mt-6">$59/mo | Cancel anytime | Updated daily</p>
         </div>
       </section>
 
@@ -345,7 +345,7 @@ function FaqSection() {
   const faqs = [
     { q: "I'm not technical. Is this still for me?", a: "Absolutely. Outraro is designed for sales reps, not developers. Every walkthrough assumes zero coding knowledge. If you can use a CRM, you can follow along." },
     { q: "What if I already use ChatGPT at work?", a: "ChatGPT is a chat box. The tools we cover, like Claude Cowork, Perplexity Computer, and others, are autonomous agents that execute workflows, manage files, and run tasks across your desktop. That's a different category entirely." },
-    { q: "How is this different from a YouTube tutorial?", a: "YouTube gives you overviews. We give you the exact workflows, prompts, and templates built specifically for B2B SDRs and AEs. Plus, AI tools change weekly. YouTube videos go stale. Outraro stays current because that's the entire point." },
+    { q: "How is this different from a YouTube tutorial?", a: "YouTube gives you overviews. We give you the exact workflows, prompts, and templates built specifically for B2B SDRs and AEs. Plus, AI tools change daily. YouTube videos go stale. Outraro stays current because that's the entire point." },
     { q: "Is AI really going to replace SDRs?", a: "Not all of them, but most of the traditional ones, yes. AI SDR adoption is projected to hit 55-60% by end of 2026. The reps who survive are the ones who know how to work alongside these tools, not compete against them." },
     { q: "Can I cancel anytime?", a: "Yes. One click cancellation, no questions asked, no contracts. But once you see how fast AI is moving and how far ahead you are compared to your peers, you probably won't want to." },
   ];
